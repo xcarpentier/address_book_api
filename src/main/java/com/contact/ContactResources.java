@@ -46,21 +46,10 @@ public class ContactResources {
         @FormParam("lname") String lastName, @FormParam("email") String email) {
         
         
-
-        testMethod();
-        
-        
-        
-        
-        
         return null;
     }
 
-    private void testMethod() {
-        for (int i = 0; i < 10; i++) {
-            System.out.println(i);            
-        }
-    }
+  
 
     /* READ */
 
