@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="AddressBookAPI:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="rest-contact.war">
+      <element id="artifact" artifact-name="AddressBookAPI:war exploded" />
+    </root>
+  </artifact>
+</component>
