@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Contact {
+
     private Integer id;
     private String firstName;
     private String lastName;

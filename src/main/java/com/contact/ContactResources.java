@@ -1,5 +1,11 @@
 package com.contact;
 
+import com.sun.jersey.spi.resource.Singleton;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -7,27 +13,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
-import com.sun.jersey.spi.resource.Singleton;
-
 @Singleton
 @Path("/contacts/")
 public class ContactResources {
+
 
     private static final int MAX_RETURN = 10;
     private final AtomicInteger idCounter = new AtomicInteger();
@@ -38,10 +27,29 @@ public class ContactResources {
     @POST
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addContact(@FormParam("fname") String firstName,
-                               @FormParam("lname") String lastName, @FormParam("email") String email) {
+                               @FormParam("lname") String lastName,
+                               @FormParam("email") String email) {
 
-        // TODO add contact to my list
-        return null;
+        final Contact contact = new Contact();
+        contact.setEmail(email);
+        contact.setFirstName(firstName);
+        contact.setLastName(lastName);
+        contact.setId(idCounter.getAndIncrement());
+
+        contacts.put(contact.getId(), contact);
+
+        return Response.created(URI.create(contact.getId() + "")).entity(contact).build();
+
+    }
+
+
+    @POST
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addContactJSON(Contact contact) {
+        contact.setId(idCounter.getAndIncrement());
+        contacts.put(contact.getId(), contact);
+        return Response.created(URI.create(contact.getId() + "")).entity(contact).build();
     }
 
 
@@ -60,6 +68,7 @@ public class ContactResources {
 
         return Response.ok(contacts.get(id)).build();
     }
+
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -94,8 +103,8 @@ public class ContactResources {
         return Response.ok(contactList.subList(start, end).toArray(new Contact[0])).build();
     }
 
-    /* UPDATE */
 
+    /* UPDATE */
     @PUT
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -117,8 +126,8 @@ public class ContactResources {
         return Response.ok(contact).build();
     }
 
-    /* DELETE */
 
+    /* DELETE */
     @DELETE
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -135,18 +144,11 @@ public class ContactResources {
         return Response.noContent().build();
     }
 
+
+    /* DELETE ALL */
     @DELETE
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response removeAll() {
-        contacts.clear();
-        return Response.noContent().build();
-    }
-
-    /* COUNT */
-
-    @HEAD
-    @Path("count")
-    public Response count() {
-        return Response.ok().header("X-COUNT", contacts.size()).build();
+        return Response.status(405).build();
     }
 }
